@@ -4,6 +4,7 @@
  *  Created on: Apr 12, 2018
  *      Author: user
  */
+#define __MAIN_C__
 #include "Arduino.h"
 #include "fingerprint_data.h"
 #include "SoftwareSerial.h"
@@ -15,43 +16,42 @@
 #include "ListIdUsed.h"
 #include "AddNewId.h"
 #include  "userconfig.h"
-
+//dataSeveinVmc
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 DeviceStatusRunTime deviceRunTime;
 DeviceConfigStore deviceConfig;
+dataSave dataSaveInEf VMC;
 /*unsigned char addnewId = 0;
-unsigned long timeProvince;
+ unsigned long timeProvince;
+ char datasend_encoder[6];
+ char input_uart[50];
+
+ unsigned long x = 0;
+ unsigned long y = 0;
+
+
+ unsigned char changeId = 0;
+ unsigned char getId = 0;
+
+ unsigned char callAddIdFromApp = 0;
+ unsigned char callChangeIdFromApp = 0;
+ unsigned char callGetIdFromApp = 0;
+
+ unsigned char secondScan = 0;
+ unsigned char beep = 0;
+
+ volatile unsigned char numberIdChange = 0;
+ volatile unsigned char sttGetGps = 0;
+ volatile unsigned char sumIdUsed = 0;
+ unsigned long delayTest = 0;
+
+ volatile unsigned char timeGps = 0;*/
 char datasend_encoder[6];
 char input_uart[50];
-
-unsigned long x = 0;
-unsigned long y = 0;
-
-
-unsigned char changeId = 0;
-unsigned char getId = 0;
-
-unsigned char callAddIdFromApp = 0;
-unsigned char callChangeIdFromApp = 0;
-unsigned char callGetIdFromApp = 0;
-
-unsigned char secondScan = 0;
-unsigned char beep = 0;
-
-volatile unsigned char numberIdChange = 0;
-volatile unsigned char sttGetGps = 0;
-volatile unsigned char sumIdUsed = 0;
-unsigned long delayTest = 0;
-
-volatile unsigned char timeGps = 0;*/
-char datasend_encoder[6];
-char input_uart[50];
-csshocksize StartSaveEflat;
-
+//csshocksize StartSaveEflat;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 void beepMutil (uint32_t freq, uint32_t duration, uint32_t space, uint16_t times)
 {
@@ -94,44 +94,67 @@ ucsstype getGpsFromEeprom (void)
 # endif
     return 0;
   }
-
-  if (fmRead ((csshocksize) StartSaveEflat-longGpsData) != 0xFF)
+  uint8_t longGpsLocal = 0xFF;
+  fmReadsCES(dataSave, longGps, longGpsLocal, dataSaveInEf);
+  if (longGpsLocal != 0xFF)
   {
-
-    //check data
     spPM("getgps(ok,");
-
-    for (csshocksize i = (csshocksize) (StartSaveEflat - locationStartSaveGpsData);
-        i < (csshocksize) (      (csshocksize)( StartSaveEflat - locationStartSaveGpsData) +  (csshocksize) (fmRead ((csshocksize) StartSaveEflat-longGpsData ) -25) )  ; i++)
+    for (uint8_t i = 0; i < longGpsLocal; i++)
     {
+      printInt32NoPad (dataSaveInEf.gpsData[i]);
 
-      spb(fmRead(i));
     }
-
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    for (csshocksize i = (csshocksize) (      (csshocksize)( StartSaveEflat - locationStartSaveGpsData) +  (csshocksize) (fmRead ((csshocksize) StartSaveEflat-longGpsData ) -25) )  ;
-        i < (csshocksize) (     (csshocksize)( StartSaveEflat -locationStartSaveGpsData)+ (csshocksize) fmRead((StartSaveEflat-longGpsData ) )    ); i++)
-    {
-
-      spb(fmRead(i));
-    }
-
     splnPM(");");
 
-   // send time
     spPM("distanceTimeRead(");
-    printInt32NoPad((uint32_t) ( millis()-deviceRunTime.disTanceTimeReadGps )   );
+    printInt32NoPad ((uint32_t) (millis () - deviceRunTime.disTanceTimeReadGps));
     splnPM(");");
     return 1;
   }
   else
   {
-    splnPM ("getgps(fail);");
+    splnPM("getgps(fail);");
   }
   return 0;
 }
+/* if (fmRead ((csshocksize) StartSaveEflat-longGpsData) != 0xFF)
+ {
+
+ //check data
+ spPM("getgps(ok,");
+
+ for (csshocksize i = (csshocksize) (StartSaveEflat - locationStartSaveGpsData);
+ i < (csshocksize) (      (csshocksize)( StartSaveEflat - locationStartSaveGpsData) +  (csshocksize) (fmRead ((csshocksize) StartSaveEflat-longGpsData ) -25) )  ; i++)
+ {
+
+ spb(fmRead(i));
+ }
+
+
+ //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ for (csshocksize i = (csshocksize) (      (csshocksize)( StartSaveEflat - locationStartSaveGpsData) +  (csshocksize) (fmRead ((csshocksize) StartSaveEflat-longGpsData ) -25) )  ;
+ i < (csshocksize) (     (csshocksize)( StartSaveEflat -locationStartSaveGpsData)+ (csshocksize) fmRead((StartSaveEflat-longGpsData ) )    ); i++)
+ {
+
+ spb(fmRead(i));
+ }
+
+ splnPM(");");
+
+ // send time
+ spPM("distanceTimeRead(");
+ printInt32NoPad((uint32_t) ( millis()-deviceRunTime.disTanceTimeReadGps )   );
+ splnPM(");");
+ return 1;
+ }
+ else
+ {
+ splnPM ("getgps(fail);");
+ }
+ return 0;
+ }*/
+
 ucsstype changeID (void)
 {
   if (deviceRunTime.addnewId != 0 || deviceRunTime.getId != 0)
@@ -163,7 +186,8 @@ ucsstype changeID (void)
   deviceRunTime.numberIdChange = getarg (1);
   if (0 >= getarg (1) || getarg (1) > 127)
     return 2;
-  uint8_t x = changeIdFinger (getarg (1), (csshocksize) (StartSaveEflat - locationStartIdEeprom) );
+  // uint8_t x = changeIdFinger ( getarg (1), (csshocksize) (StartSaveEflat - locationStartIdEeprom) );
+  uint8_t x = changeIdFinger (getarg (1), dataSaveInEf);
   if (x == 2)
     return 1;
   return 0;
@@ -171,36 +195,44 @@ ucsstype changeID (void)
 
 ucsstype clearID123 (void)
 {
+
   if (deviceRunTime.addnewId != 0 || deviceRunTime.getId != 0 || deviceRunTime.changeId != 0)
-    return 0;
+    {
+    return 1;
+    }
   if (!getarg (0))
   {
 #if( DEBUG12 ==1 )
     spln ("khong co tham so dc truyen ");
 #endif
-    return 1;
+    return 2;
   }
   if (getarg (0) > 1)
   {
 #if( DEBUG12 ==1 )
     spln ("truyen sai so tham so ");
 #endif
-    return 1;
+
+    return 3;
   }
   if (isstringarg (1))
   {
 #if( DEBUG12 ==1 )
     spln ("tham so khong phai dang so ");
 #endif
-    return 2;
+    return 4;
   }
 
   finger_Config (57600);
-  if (0 > getarg (1) || getarg (1) > 127)
-    return 1;
-  uint8_t x = ClearId (getarg (1), (csshocksize) (StartSaveEflat - locationStartIdEeprom));
-  if (x == 2)
-    return 3;
+  if (0 >= getarg (1) || getarg (1) > 127)
+  {
+  return 5;
+  }
+  uint8_t x = ClearId (getarg (1), dataSaveInEf);
+  if (x == 5)
+  {
+    return 6;
+  }
   return 0;
 }
 ucsstype listID (void)
@@ -214,7 +246,8 @@ ucsstype listID (void)
   }
 
   finger_Config (57600);
-  ListIdUsed (1, 127, (csshocksize) (StartSaveEflat - locationStartIdEeprom));
+//  ListIdUsed (1, 127, (csshocksize) (StartSaveEflat - locationStartIdEeprom) );
+  ListIdUsed (127, dataSaveInEf);
   return 0;
 }
 
@@ -232,7 +265,8 @@ ucsstype addID (void)
     return 0;
   deviceRunTime.callAddIdFromApp = 1;
   finger_Config (57600);
-  uint8_t x = AddNewId (1, 127, (csshocksize) (StartSaveEflat - locationStartIdEeprom));
+  // uint8_t x = AddNewId (1, 127, (csshocksize) (StartSaveEflat - locationStartIdEeprom));
+  uint8_t x = AddNewId (127, dataSaveInEf);
   if (x == 2)
     return 1;
   return 0;
@@ -274,7 +308,7 @@ ucsstype getScr (void)
   }
   else
   {
-    splnPM ("fgreadscr(fail);");
+    splnPM("fgreadscr(fail);");
   }
   return 0;
 }
@@ -298,23 +332,25 @@ ucsstype setScr (void)
     return 4;
   if (fingerSetsyspara (5, (uint8_t) getarg (1), (uint8_t *) input_uart, 150) == 0)
   {
-    splnPM ("fgsetscr(ok);");
+    splnPM("fgsetscr(ok);");
   }
   else
   {
-    splnPM ("fgsetscr(fail);");
+    splnPM("fgsetscr(fail);");
   }
   return 0;
 }
 
 void gpsRead ()
 {
-  if (fmRead ((csshocksize) StartSaveEflat- longGpsData) == 0xFF )
+ // if (fmRead ((csshocksize) StartSaveEflat - longGpsData) == 0xFF);
+    if(fmGetCES(dataSave,longGps,dataSaveInEf) == 0xFF)
   {
 #if( DEBUG121 ==1 )
     splnPM ("van chua doc dc gps ");
 #endif
-    uint8_t l = getGpsData_softWareSerial (deviceRunTime.sttGetGps, (csshocksize) StartSaveEflat- locationStartSaveGpsData);
+    // uint8_t l = getGpsData_softWareSerial (deviceRunTime.sttGetGps,(csshocksize) StartSaveEflat - locationStartSaveGpsData);
+    uint8_t l = getGpsData_softWareSerial (deviceRunTime.sttGetGps, dataSaveInEf);
     if (l >= 2)
     {
       deviceRunTime.sttGetGps = 0;
@@ -335,7 +371,8 @@ void gpsRead ()
     if ((millis () - gps2) < 2000)
     {
       // spln("nho hon 2000");
-      uint8_t l = getGpsData_softWareSerial (deviceRunTime.sttGetGps,(csshocksize) StartSaveEflat- locationStartSaveGpsData);
+    //  uint8_t l = getGpsData_softWareSerial (deviceRunTime.sttGetGps,(csshocksize) StartSaveEflat - locationStartSaveGpsData);
+      uint8_t l = getGpsData_softWareSerial (deviceRunTime.sttGetGps, dataSaveInEf);
       //  printlnUint32 (l, 5, 'l');
       if (l >= 2)
       {
@@ -365,52 +402,58 @@ void printHex (int num, int precision)
 }
 #endif
 
+volatile uint16_t x = 1;
 
 void sbashInit (void)
 {
-  initCSShock(115200);
+
+//  while(1);
+  initCSShock (115200);
   config_GPSneo (9600);
-   finger_Config (57600);
-   if( !fingerVerifyPassword())
-   {
-     splnPM("finger error ");
-      debug;
-   }
+  finger_Config (57600);
+  if (!fingerVerifyPassword ())
+  {
+    splnPM("finger error ");
+    debug;
+  }
 
   addCSShockFunction ("gpsget", (csshock_func) getGpsFromEeprom);
-   addCSShockFunction ("fgchange", (csshock_func) changeID);
+  addCSShockFunction ("fgchange", (csshock_func) changeID);
   addCSShockFunction ("fgclear", (csshock_func) clearID123);
   addCSShockFunction ("fglist", (csshock_func) listID);
   addCSShockFunction ("fgaddnew", (csshock_func) addID);
   addCSShockFunction ("fgget", (csshock_func) getFG);
   addCSShockFunction ("fgscrget", (csshock_func) getScr);
- addCSShockFunction ("fgscrset", (csshock_func) setScr);
+  addCSShockFunction ("fgscrset", (csshock_func) setScr);
+  SHOW_DEFINE_UINT(dataSaveInEf.gpsData);
+  SHOW_DEFINE_UINT(dataSaveInEf.idUsed);
+  SHOW_DEFINE_UINT(&dataSaveInEf.longGps);
+
+  // fmWritesCES(dataSave,idUsed[0],value,dataSaveInEf);
 }
 
 void dataInit (void)
- {
-    StartSaveEflat = fmGetUserStartAddress();
-   memset(&deviceConfig, 0, sizeof(deviceConfig));
-   memset(&deviceRunTime, 0, sizeof(deviceRunTime));
-
- }
-void setup ()
 {
 
-  sbashInit();
-  dataInit();
-
-  StartSaveEflat = fmGetUserStartAddress();
-  spPM( "Start Save ef=");
-  printInt32NoPad(StartSaveEflat);
-  fmWrite ((csshocksize) StartSaveEflat - longGpsData, 0XFF);
-
-
-
-
-
+  memset (&deviceConfig, 0, sizeof(deviceConfig));
+  memset (&deviceRunTime, 0, sizeof(deviceRunTime));
 
 }
+void setup ()
+{
+  initCSShock (115200);
+
+  sbashInit ();
+  dataInit ();
+
+ /* StartSaveEflat = fmGetUserStartAddress ();
+  spPM("Start Save ef=");
+  printInt32NoPad (StartSaveEflat);*/
+ // fmWrite ((csshocksize) StartSaveEflat - longGpsData, 0XFF);
+  uint8_t value =0xFF;
+  fmWritesCES(dataSave,longGps,value,dataSaveInEf);
+}
+
 // The loop function is called in an endless loop
 void loop ()
 {
@@ -435,7 +478,8 @@ void loop ()
     {
 
       finger_Config (57600);
-      AddNewId (1, 127, (csshocksize) (StartSaveEflat - locationStartIdEeprom));
+      //  AddNewId (1, 127, (csshocksize) (StartSaveEflat - locationStartIdEeprom));
+      AddNewId (127, dataSaveInEf);
     }
     else if (deviceRunTime.addnewId == 2)
     {
@@ -449,7 +493,7 @@ void loop ()
       deviceRunTime.secondScan = 0;
       if (deviceRunTime.addnewId == 1)
       {
-        splnPM ("addnewid(fail);");
+        splnPM("addnewid(fail);");
         deviceRunTime.addnewId = 0;
         timeOut ();
       }
@@ -466,7 +510,8 @@ void loop ()
     if (millis () < changeidTimeout && deviceRunTime.changeId == 1)
     {
       finger_Config (57600);
-      changeIdFinger (deviceRunTime.numberIdChange, (csshocksize) (StartSaveEflat - locationStartIdEeprom));
+      //  changeIdFinger (deviceRunTime.numberIdChange, (csshocksize) (StartSaveEflat - locationStartIdEeprom));
+      changeIdFinger (deviceRunTime.numberIdChange, dataSaveInEf);
     }
     else if (deviceRunTime.changeId == 2)
     {
@@ -481,7 +526,7 @@ void loop ()
       deviceRunTime.secondScan = 0;
       if (deviceRunTime.changeId == 1)
       {
-        splnPM ("changeid(fail);");
+        splnPM("changeid(fail);");
         deviceRunTime.changeId = 0;
         timeOut ();
       }
@@ -509,7 +554,7 @@ void loop ()
     {
       if (deviceRunTime.getId == 1)
       {
-        splnPM ("getid(fail);");
+        splnPM("getid(fail);");
         deviceRunTime.getId = 0;
         timeOut ();
       }
@@ -517,32 +562,10 @@ void loop ()
   }
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-  /*  if (fmRead (longGpsData) == 0)
-   {
-   uint8_t l = getGpsData_softWareSerial (sttGetGps, locationStartSaveGpsData);
-   if (l >= 2)
-   {
-   sttGetGps = 0;
-   }
-   }
-   else if (fmRead (longGpsData) != 0)
-   {
-   gps1 = millis ();
 
-   if (millis () > p2 + 8000)
-   {
-   static unsigned long gps2 = millis ()
-   uint8_t l = getGpsData_softWareSerial (sttGetGps, locationStartSaveGpsData);
-   //  printlnUint32 (l, 5, 'l');
-   if (l >= 2)
-   {
-   sttGetGps = 0;
-   }
-   }
-   }*/
   gpsRead ();
 
   runCSShock ();
-
+  //
 }
 

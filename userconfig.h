@@ -6,6 +6,8 @@
  */
 
 #ifndef USERCONFIG_H_
+
+
 #define USERCONFIG_H_
 
 #define DEBUG12  0
@@ -53,6 +55,7 @@ typedef struct
 
     volatile unsigned char timeGps = 0;
     volatile unsigned long disTanceTimeReadGps =0;
+
 } DeviceStatusRunTime;
 
 typedef struct
@@ -123,11 +126,21 @@ extern  void OK(void);
 extern  void timeOut(void);
 extern  void putHandOnFg2 (void);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define locationStartIdEeprom (127)
-#define locationStartSaveGpsData  (127+60)
-#define longGpsData  (127+60+1)
-#define button 7
-#define Newproduct ((127+1+1)+1)
+// #define locationStartIdEeprom (127)
+//#define locationStartSaveGpsData  (127+60)
+// #define longGpsData  (127+60+1)
+//#define Newproduct ((127+1+1)+1)
+
+typedef struct
+{
+    uint8_t  idUsed[127];
+    uint8_t  gpsData[40];
+    uint8_t longGps;
+} dataSave;
+
+extern dataSave dataSaveInEf VMC;
+
+
 #define debug   while(1) { runCSShock (); }
 #define testAddID 0
 

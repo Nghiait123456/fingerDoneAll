@@ -9,7 +9,7 @@
 #include "SoftwareSerial.h"
 #include "userconfig.h"
 
-uint8_t changeIdFinger (uint8_t id, csshocksize eepromLocationStatSave)
+uint8_t changeIdFinger (uint8_t id,  dataSave &data)
 {
   deviceRunTime.changeId = 1;
 #if( DEBUG12 ==1 )
@@ -24,7 +24,9 @@ uint8_t changeIdFinger (uint8_t id, csshocksize eepromLocationStatSave)
   uint8_t p = create_Template (id, NULL); // them 1 id moi thanh cong tra ve 0 va 512bye id
   if (p == 9)
   {
-    fmWrite (id + eepromLocationStatSave, 1);
+   // fmWrite (id + eepromLocationStatSave, 1);
+    uint8_t value =1;
+    fmWritesCES(dataSave,idUsed[id-1],value,data);
     deviceRunTime.changeId = 2;
     splnPM( "changefg(ok);" );
     // in ra va update vao bo nho

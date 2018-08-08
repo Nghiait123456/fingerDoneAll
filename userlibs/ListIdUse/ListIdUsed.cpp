@@ -1,23 +1,3 @@
-/*
- * ListIdUsed.cpp
- *
- *  Created on: Jun 6, 2018
- *      Author: user
- */
-
-/*
- * getGPSparck.cpp
- *
- *  Created on: May 14, 2018
- *      Author: user
- */
-
-/*
- * getGPSPark.cpp
- *
- *  Created on: Apr 19, 2018
- *      Author: user
- */
 #include "Arduino.h"
 #include "fingerprint_data.h"
 #include "readAndCompareFinger.h"
@@ -52,14 +32,12 @@
  h++;
  if( h == 15 )
  {
-
  h=0;
  sp(input_uart);
  for( int t= 0; t < sizeof(input_uart); t++ )
  {
  input_uart[t]=0;
  }
-
  }
  }
  }
@@ -80,10 +58,9 @@
  spln(input_uart);
  // in ra chuoi
  }
-
  */
 
-uint8_t ListIdUsed (uint16_t eeprom_start, int MaxSizeId, uint16_t eepromLocationStartSaveId)
+uint8_t ListIdUsed ( int MaxSizeId, dataSave &data)
 {
 
   uint16_t sum = fingerTemplatecount ();
@@ -94,63 +71,29 @@ uint8_t ListIdUsed (uint16_t eeprom_start, int MaxSizeId, uint16_t eepromLocatio
   }
   else
   {
-    int i = 0;
-    int l = 5;
-    int sumid = 0;
-    uint16_t eeprom_start1 = eeprom_start;
-    int h = 0;
-    memset (input_uart, 0, sizeof(input_uart));
-    // convert h sang string
-    datasend_encoder[0] = 0;
-    strcat (input_uart, "listid(");
-    while (i <= eeprom_start + MaxSizeId)
+    sp("listid(");
+    uint8_t sumCount =0;
+    uint8_t temp =0;
+    for( uint8_t i=0; i < MaxSizeId; i++ )
     {
-      for (int j = eeprom_start1; j < eeprom_start1 + l; j++)
-      {
-        i = j;
-        if (j > eeprom_start + MaxSizeId)
-          break;
-        datasend_encoder[0] = 0;
+      temp=0;
 
-        if (fmRead ((j + eepromLocationStartSaveId)) == 1)
-        {
-          h++;
-          sumid++;
-          sprintf (datasend_encoder, "%d", j);
-          strcat (input_uart, datasend_encoder);
-          if (sumid < sum)
-          {
-            strcat (input_uart, ",");
-          }
-          else if (sumid >= sum)
-            break;
-
-          if (h == 15)
-          {
-
-            h = 0;
-            sp (input_uart);
-            memset (input_uart, 0, sizeof(input_uart));
-
-          }
-        }
-      }
-      eeprom_start1 = eeprom_start1 + l;
-      if (sumid >= sum)
-        break;
+      // fmReadsCES(,idUsed[i],temp,data);
+      fmReadsCES(data,idUsed[i],temp,data);
+       if(temp==1)
+       {
+         printInt32NoPad(i+1);
+         sumCount++;
+         if( sum != sumCount)
+         spPM(",");
+         if(sumCount %  20  == 0 && sumCount != 0  )
+         {
+           speol();
+         }
+         if( sumCount == sum ) break;
+       }
     }
-    // print h < 6
-    if (h > 0 && h < 15)
-    {
-      h = 0;
-      sp (input_uart);
-    }
-    // gui chuoi end
-    memset (input_uart, 0, sizeof(input_uart));
-    strcat (input_uart, ");");
-    spln (input_uart);
-    // in ra chuoi
+    spln(");");
+   return 1;
   }
-  return 1;
 }
-

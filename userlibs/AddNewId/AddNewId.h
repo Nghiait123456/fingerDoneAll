@@ -10,9 +10,7 @@
 #include "userconfig.h"
 
 
-#if (testAddID ==1)
-uint8_t AddNewId (uint8_t ID_firstly, uint8_t Max_size_id, csshocksize eepromLocationStatSave);
-#else
-uint8_t AddNewId (uint8_t ID_firstly, uint8_t Max_size_id, csshocksize eepromLocationStatSave);
-#endif
+
+uint8_t AddNewId ( uint8_t maxSizeId, dataSave &data);
+
 #endif /* ADDNEWID_ADDNEWID_H_ */

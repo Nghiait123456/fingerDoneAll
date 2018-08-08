@@ -7,7 +7,6 @@
 
 #ifndef LISTIDUSE_LISTIDUSED_H_
 #define LISTIDUSE_LISTIDUSED_H_
-
-uint8_t ListIdUsed (uint16_t eeprom_start, int MaxSizeId, uint16_t eepromLocationStartSaveId);
+uint8_t ListIdUsed ( int MaxSizeId, dataSave &data);
 
 #endif /* LISTIDUSE_LISTIDUSED_H_ */

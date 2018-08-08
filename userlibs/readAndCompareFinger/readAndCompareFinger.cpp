@@ -16,7 +16,7 @@ uint8_t readAndCompaeFinger(void)
          if( p== 3   )
              {
                deviceRunTime.getId = 2;
-               memset (input_uart, 0, sizeof(input_uart));
+               /*memset (input_uart, 0, sizeof(input_uart));
                strcat(input_uart,"getfg(\"ok\",");
                for( uint8_t i=0; i< sizeof(datasend_encoder); i++ )
                {
@@ -25,7 +25,10 @@ uint8_t readAndCompaeFinger(void)
                sprintf(datasend_encoder,"%d", id );
                strcat(input_uart,datasend_encoder);
                strcat(input_uart,")");
-               spln(input_uart);
+               spln(input_uart);*/
+               spPM("getfg(ok,");
+               printInt32NoPad(id);
+               splnPM(");");
              // in ra
                OK();
               return 2; // id trung khop

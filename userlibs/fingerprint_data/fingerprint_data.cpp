@@ -217,7 +217,7 @@ uint8_t create_Template (uint8_t id, uint8_t *tempBuff)
   splnPM("nguoi dung hay nhac tay ra sau do dat lai ");
 #endif
 
-   splnPM(" a");
+  // splnPM("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
   // printInt32NoPad(deviceRunTime.secondScan);
    if (deviceRunTime.secondScan == 2)
@@ -231,7 +231,7 @@ uint8_t create_Template (uint8_t id, uint8_t *tempBuff)
   // if( beep==1) putHandOnFg();
   if (deviceRunTime.secondScan == 0 && finger.getImage () == FINGERPRINT_NOFINGER)
   {
-    splnPM("dat tay lan 1");
+  //  splnPM("dat tay lan 1");
     deviceRunTime.beep = 1; // da nhac tay
     if (deviceRunTime.beep == 1)
       putHandOnFg()
@@ -288,12 +288,12 @@ uint8_t create_Template (uint8_t id, uint8_t *tempBuff)
     deviceRunTime.beep = 1;
     deviceRunTime.secondScan = 2;
   }
-  splnPM("khong nhac t t khoi 2");
+//  splnPM("khong nhac t t khoi 2");
   if (deviceRunTime.secondScan != 2)
     return 4;
   if (deviceRunTime.secondScan == 2)
   {
-    splnPM("dat tay lan 2");
+   // splnPM("dat tay lan 2");
 
     putHandOnFg2()
     ;
